@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html ng-app="FoodManagementApp">
+<head>
+    <title>Quản lý món ăn</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <script src="/js/food-management.js"></script>
+</head>
+<body ng-controller="FoodManagementCtrl">
+    <div class="container">
+        <h1>🍽️ Quản lý món ăn</h1>
+
+        <!-- Form thêm món ăn -->
+        <div class="add-food-form">
+            <h3>➕ Thêm món ăn mới</h3>
+            <div class="form-grid">
+                <input type="text" ng-model="newFood.name" placeholder="Tên món ăn *" required>
+                <input type="number" ng-model="newFood.price" placeholder="Giá *" min="0" required>
+                <select ng-model="newFood.category" required>
+                    <option value="">Chọn danh mục *</option>
+                    <option ng-repeat="cat in categories" value="{{cat._id}}">{{cat.name}}</option>
+                </select>
+                <select ng-model="newFood.status">
+                    <option ng-repeat="status in statusOptions" value="{{status.value}}">
+                        {{status.label}}
+                    </option>
+                </select>
+                <input type="text" ng-model="newFood.image" placeholder="URL hình ảnh" class="full-width">
+                <button ng-click="addFood()" class="btn-add">Thêm món ăn</button>
+            </div>
+        </div>
+
+        <!-- Danh sách món ăn -->
+        <div class="food-list">
+            <h3>📋 Danh sách món ăn ({{foods.length}} món)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Hình ảnh</th>
+                        <th>Tên món</th>
+                        <th>Giá</th>
+                        <th>Danh mục</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="food in foods track by $index">
+                        <td>{{$index + 1}}</td>
+                        <td>
+                            <img ng-src="{{food.image || '/images/default-food.jpg'}}"
+                                 alt="{{food.name}}"
+                                 class="food-image"
+                                 onerror="this.src='/images/default-food.jpg'">
+                        </td>
+                        <td><strong>{{food.name}}</strong></td>
+                        <td class="price">{{food.price | currency:'':0}} VNĐ</td>
+                        <td>{{food.category?.name}}</td>
+                        <td>
+                            <span class="status-badge {{getStatusClass(food.status)}}">
+                                {{getStatusLabel(food.status)}}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn-edit" ng-click="editFood(food)">✏️ Sửa</button>
+                            <button class="btn-delete" ng-click="deleteFood(food._id)">🗑️ Xóa</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Form chỉnh sửa (Modal) -->
+        <div class="modal" ng-if="editingFood">
+            <div class="modal-content">
+                <h3>✏️ Chỉnh sửa món ăn</h3>
+                <div class="form-grid">
+                    <input type="text" ng-model="editingFood.name" placeholder="Tên món ăn">
+                    <input type="number" ng-model="editingFood.price" placeholder="Giá" min="0">
+                    <select ng-model="editingFood.category">
+                        <option ng-repeat="cat in categories" value="{{cat._id}}">
+                            {{cat.name}}
+                        </option>
+                    </select>
+                    <select ng-model="editingFood.status">
+                        <option ng-repeat="status in statusOptions" value="{{status.value}}">
+                            {{status.label}}
+                        </option>
+                    </select>
+                    <input type="text" ng-model="editingFood.image" placeholder="URL hình ảnh" class="full-width">
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-update" ng-click="updateFood()">💾 Cập nhật</button>
+                    <button class="btn-cancel" ng-click="cancelEdit()">❌ Hủy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
